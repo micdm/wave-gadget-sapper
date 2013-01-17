@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+    <ModulePrefs title="Sapper" description="Like a minesweeper!" author="Mic">
+        <Require feature="wave" />
+        <Require feature="dynamic-height" />
+    </ModulePrefs>
+    <Content type="html">
+    <![CDATA[
+        <!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            * {
+    padding: 0;
+    margin: 0;
+    font-family: sans;
+}
+
+body {
+    padding: 5px;
+}
+
+#menu, #game {
+    display: none;
+}
+
+#restart {
+    position: absolute;
+    padding: 5px;
+}
+
+#bomb-counter {
+    position: absolute;
+    top: 25px;
+    font-size: 32px;
+    padding: 5px;
+}
+
+#field-container {
+    position: absolute;
+    left: 60px;
+}
+
+#well-done, #game-over {
+    display: none;
+    padding: 5px;
+    position: absolute;
+    left: 5px;
+    top: 5px;
+}
+
+#well-done {
+    background: lightgreen;
+}
+
+#game-over {
+    background: pink;
+}
+
+#field {
+    border-collapse: collapse;
+}
+
+#field td {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ccc;
+    background: gray;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+#field td:hover {
+    border: 1px double #fff;
+}
+
+#field td.opened {
+    background: lightgray;
+    font-weight: bold;
+    cursor: default;
+}
+
+#field td.opened:hover {
+    border: 1px solid #ccc;
+}
+
+#field td.around-1 {
+    color: #354f00;
+}
+
+#field td.around-2 {
+    color: #4f3500;
+}
+
+#field td.around-3 {
+    color: #4f0000;
+}
+
+#field td.around-4 {
+    color: #004f35;
+}
+
+#field td.around-5 {
+    color: #00354f;
+}
+
+#field td.around-6 {
+    color: #00004f;
+}
+
+#field td.around-7 {
+    color: #35004f;
+}
+
+#field td.around-8 {
+    color: #4f0035;
+}
+
+#field td.flagged {
+    background: no-repeat center center url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wAAAAAzJ3zzAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QEMEAAhRY2AdwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAFpSURBVDjLrdQxTsMwFMbx/yupy5CFoTZS0iOwcJ0w9Apcg4VLsDGVE/QAHZmRUM1QM0QIBuxCHwNEUNrSUPVJWSL5p8/P9pPJZKLssbLfP1JKPIWATQljDMla1JjdwRACN5eXnHvPoN8nnJ0Ri4LkXCt4bcJH75G7O/LplJ73xLJsDS+Bqgqq6GKBqHKQEgfeY2az1nDWpi+d+ZzDlnDn50IRga9PAV0D97wnv73FXl3Rv74mq+v/J2xq0e0yd+4zYVURy5K3o6PtPUQVAaSBsoz58TGxLJlV1fJWRdonfM8y3lpCG0EFXoH7bpf+yQn1cEgqy63QxkMRER5EuHCOyXDI8+kpcTBAe72t2ArYVASmxvDiXGvoT7DZ+i5To8Oea+9g9nswhBBIKQHgvf9+QV9ljMFai9kwIJbAuq4Zj8fkeY6qMhqNVhZaa6mqCufcWlB+TuwmYYxxJdlOCY0xFEWxtU/yxzX6AOPLtQuD+gVrAAAAAElFTkSuQmCC);
+}
+
+#field td.mined {
+    background: no-repeat center center url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QEMDzYvPFPYSAAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAH2SURBVDjLpdW/alRREAbw392Y7CYhWGhEMRtR0VQGLAJWgpWF4AOoT+ADCFY2BlELK2uxsLO0sRJL0UIUgyAKxhijiJGIySab7NjM6s1ykxQOHJgzZ87c73zz5xZB2EEiV83OsmsnhxXMYx1NDFV8rCjtt/3oOt7jNqYxi06PTzfYRhXCNXxO4z70oY0Z/MLPDNjGQuoHMZC+mwJGIriWh5cwik/4kZeX8S5t9xLdNA5XcdjBagZ7imcYxzm00mcGdxLdd5wuISuTGt21TDwhpogBokE0iXquJjFI9BPHicdEq3Q/iFpvyndjf+otzCXy1dRXElUzKemrKpvfWRotLOEsXiZn0VMisDepmMv9SCZnEEWbeIXr6bCRGZ1NVFVST4T1rMsjuIJJ1IqEXc/ErPXU11ZSQyP9Wrk6KDrEEr6kcRFvcCvLo0rGcRUT2JNPPYDhcpY7xBrxgjhPDGULF/9a+a8+QlwkXhPtrbJcZAfM41s+aRhjSUcj9UYm6zneVvC8qfW+4n4GPJHlcwZ38/wyHmV/L+IhprpPrQoYaTiFCziEj1kWcBQ38QEP0n9jO4RjuJFZH00aFnLq9KXzBI7hZOlOeYxtGg4DPY2+noEns5yayWGX36JijBWZYSvoz6BlaZVG1VjFee+gLbq/gE7X4P/kDxI7s+8mg81SAAAAAElFTkSuQmCC);
+}
+
+        </style>
+    </head>
+    <body>
+        <div id="menu">
+            <div>Left click to open cell, right click to toggle flag.</div>
+            <div>Mark all the bombs &rarr; you are winner!</div>
+            <div>Choose your destiny:</div>
+            <a id="start-easy" href="javascript:void(0)">Easy</a>
+            <a id="start-normal" href="javascript:void(0)">Normal</a>
+            <a id="start-hard" href="javascript:void(0)">Hard</a>
+        </div>
+        <div id="game">
+            <a id="restart" href="javascript:void(0)">New</a>
+            <div id="bomb-counter"></div>
+            <div id="field-container">
+                <div id="game-over">Game over :-(</div>
+                <div id="well-done">Well done :-)</div>
+                <table id="field"></table>
+            </div>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script>
+            var Cell = function() {
+    this.node = null;
+    this.isMined = false;
+    this.isOpened = false;
+    this.isFlagged = false;
+};
+
+var Game = function(onFieldChanged, onRestarted) {
+    this.isInitialized = false;
+    this._onFieldChanged = onFieldChanged;
+    this._onRestarted = onRestarted;
+};
+
+Game.prototype.CHANGES = {
+    MINED: 0,
+    FLAGGED: 1,
+    UNFLAGGED: 2,
+    OPENED: 3
+};
+
+Game.prototype._getBombPositions = function(width, height, count) {
+    var numbers = [];
+    var total = width * height - 1;
+    for (var i = 0; i < count; i += 1) {
+        while (true) {
+            var number = Math.round(Math.random() * total);
+            if ($.inArray(number, numbers) == -1) {
+                numbers.push(number);
+                break;
+            }
+        }
+    }
+    return numbers;
+};
+
+Game.prototype._updateBombCounter = function(delta) {
+    var counter = $('#bomb-counter');
+    var count = Number(counter.text() || 0) + delta;
+    counter.text(count);
+};
+
+Game.prototype.placeBombs = function(width, height, count) {
+    var positions = this._getBombPositions(width, height, count);
+    var changes = [];
+    for (var i in positions) {
+        var position = positions[i];
+        var x = position % width;
+        var y = Math.floor(position / width);
+        changes.push([x, y, this.CHANGES.MINED]);
+    }
+    this._onFieldChanged(changes);
+};
+
+Game.prototype._resetDom = function() {
+    $('#bomb-counter').text('0');
+    $('#game-over').hide();
+    $('#well-done').hide();
+    $('#field').empty();
+};
+
+Game.prototype._createField = function(width, height) {
+    this._width = width;
+    this._height = height;
+    for (var i = 0; i < height; i += 1) {
+        var row = {};
+        for (var j = 0; j < width; j += 1) {
+            row[j] = new Cell();
+        }
+        this._field[i] = row;
+    }
+};
+
+Game.prototype._createFieldTable = function(width, height) {
+    var field = $('#field');
+    field.empty();
+    for (var i = 0; i < height; i += 1) {
+        var row = $('<tr></tr>');
+        for (var j = 0; j < width; j += 1) {
+            var cell = $('<td data-x="' + j + '" data-y="' + i + '"></td>');
+            this._field[i][j].node = cell;
+            row.append(cell);
+        }
+        field.append(row);
+    }
+};
+
+Game.prototype._addBombToCell = function(cell) {
+    cell.isMined = true;
+    this._mined.push(cell);
+    this._updateBombCounter(1);
+};
+
+Game.prototype._getFlagCount = function() {
+    var count = 0;
+    for (var i = 0; i < this._height; i += 1) {
+        for (var j = 0; j < this._width; j += 1) {
+            if (this._field[i][j].isFlagged) {
+                count += 1;
+            }
+        }
+    }
+    return count;
+};
+
+Game.prototype._checkForWin = function() {
+    for (var i in this._mined) {
+        if (!this._mined[i].isFlagged) {
+            return;
+        }
+    }
+    var flagged = this._getFlagCount();
+    if (flagged != this._mined.length) {
+        return;
+    }
+    for (var i = 0; i < this._height; i += 1) {
+        for (var j = 0; j < this._width; j += 1) {
+            if (!this._field[i][j].isFlagged) {
+                this._openCell(j, i);
+            }
+        }
+    }
+    this._isFinished = true;
+    $('#well-done').show();
+};
+
+Game.prototype._overGame = function() {
+    for (var i in this._mined) {
+        var cell = this._mined[i];
+        cell.node.addClass('mined');
+    }
+    this._isFinished = true;
+    $('#game-over').show();
+};
+
+Game.prototype._getBombCount = function(x, y) {
+    var count = 0;
+    for (var i = y - 1; i <= y + 1; i += 1) {
+        for (var j = x - 1; j <= x + 1; j += 1) {
+            if (this._field[i] && this._field[i][j] && this._field[i][j].isMined) {
+                count += 1;
+            }
+        }
+    }
+    return count;
+};
+
+Game.prototype._openAround = function(x, y) {
+    for (var i = y - 1; i <= y + 1; i += 1) {
+        for (var j = x - 1; j <= x + 1; j += 1) {
+            if (!this._field[i] || !this._field[i][j]) {
+                continue;
+            }
+            this._openCell(j, i);
+        }
+    }
+};
+
+Game.prototype._openCell = function(x, y) {
+    var cell = this._field[y][x];
+    if (cell.isOpened || cell.isFlagged) {
+        return;
+    }
+    cell.isOpened = true;
+    cell.node.addClass('opened');
+    var bombs = this._getBombCount(x, y);
+    if (bombs) {
+        cell.node.text(bombs);
+        cell.node.addClass('around-' + bombs);
+    } else {
+        this._openAround(x, y);
+    }
+};
+
+Game.prototype.changeCell = function(x, y, change) {
+    var cell = this._field[y][x];
+    if (change == this.CHANGES.MINED) {
+        this._addBombToCell(cell);
+    }
+    if (change == this.CHANGES.FLAGGED) {
+        cell.isFlagged = true;
+        cell.node.addClass('flagged');
+        this._updateBombCounter(cell.isFlagged ? -1 : 1);
+    }
+    if (change == this.CHANGES.UNFLAGGED) {
+        cell.isFlagged = false;
+        cell.node.removeClass('flagged');
+        this._updateBombCounter(cell.isFlagged ? -1 : 1);
+    }
+    if (change == this.CHANGES.OPENED) {
+        if (cell.isMined) {
+            cell.node.addClass('mined');
+            this._overGame();
+            return;
+        }
+        this._openCell(x, y);
+    }
+    this._checkForWin();
+};
+
+Game.prototype._onCellClick = function(x, y, setFlag) {
+    var cell = this._field[y][x];
+    if (setFlag) {
+        if (cell.isOpened) {
+            return;
+        }
+        var change = [x, y, cell.isFlagged ? this.CHANGES.UNFLAGGED : this.CHANGES.FLAGGED];
+        this._onFieldChanged([change]);
+    } else {
+        if (cell.isFlagged) {
+            return;
+        }
+        var change = [x, y, this.CHANGES.OPENED];
+        this._onFieldChanged([change]);
+    }
+};
+
+Game.prototype._addClickListener = function() {
+    $('#game')
+        .contextmenu($.proxy(function() {
+            return this._isFinished;
+        }, this))
+        .mouseup($.proxy(function(event) {
+            var node = $(event.target);
+            if (node.attr('id') == 'restart') {
+                this._onRestarted();
+                return false;
+            }
+            if (this._isFinished) {
+                return false;
+            }
+            var x = node.data('x');
+            var y = node.data('y');
+            if (x != null && y != null) {
+                this._onCellClick(x, y, event.which == 3);
+            }
+            return false;
+        }, this));
+};
+
+Game.prototype._removeClickListener = function() {
+    $('#game').unbind();
+};
+
+Game.prototype.init = function(width, height) {
+    this._width = null;
+    this._height = null;
+    this._field = {};
+    this._mined = [];
+    this._isFinished = false;
+    this._createField(width, height);
+    this._createFieldTable(width, height);
+    this._addClickListener();
+    this.isInitialized = true;
+};
+
+Game.prototype.deinit = function() {
+    this._resetDom();
+    this._removeClickListener();
+    this.isInitialized = false;
+};
+
+Game.prototype.show = function() {
+    $('#game').show();
+};
+
+            var Gadget = function() {
+    this._menu = null;
+    this._game = null;
+    this._applied = [];
+};
+
+Gadget.prototype._updateState = function(delta) {
+    var state = wave.getState();
+    state.submitDelta(delta);
+};
+
+Gadget.prototype._getGameParamsByDifficulty = function(difficulty) {
+    if (difficulty == 'easy') {
+        return {
+            width: 9,
+            height: 9,
+            bombs: 10
+        };
+    }
+    if (difficulty == 'normal') {
+        return {
+            width: 16,
+            height: 16,
+            bombs: 40
+        };
+    }
+    if (difficulty == 'hard') {
+        return {
+            width: 30,
+            height: 16,
+            bombs: 99
+        };
+    }
+};
+
+Gadget.prototype._onDifficultySelected = function(difficulty) {
+    this._menu.hide();
+    this._updateState({difficulty: difficulty});
+};
+
+Gadget.prototype._onGameFieldChanged = function(cells) {
+    var chunks = [];
+    for (var i in cells) {
+        chunks.push(cells[i].join(','));
+    }
+    var delta = {};
+    var key = 'move' + (new Date()).getTime();
+    delta[key] = chunks.join(' ');
+    this._updateState(delta);
+};
+
+Gadget.prototype._onGameRestarted = function() {
+    this._game.deinit();
+    this._applied = {};
+    var delta = {};
+    var moves = this._getMoves();
+    for (var i in moves) {
+        delta[i] = null;
+    }
+    this._updateState(delta);
+};
+
+Gadget.prototype._getMoves = function() {
+    var state = wave.getState();
+    var moves = {};
+    var keys = state.getKeys();
+    for (var i in keys) {
+        var key = keys[i];
+        if (key.slice(0, 4) == 'move') {
+            moves[key] = state.get(key);
+        }
+    }
+    return moves;
+};
+
+Gadget.prototype._applyMoves = function(moves) {
+    for (var i in moves) {
+        if (i in this._applied) {
+            continue;
+        }
+        var cells = moves[i].split(' ');
+        for (var j in cells) {
+            var cell = cells[j].split(',');
+            this._game.changeCell(Number(cell[0]), Number(cell[1]), cell[2]);
+        }
+        this._applied[i] = true;
+    }
+};
+
+Gadget.prototype._onStateUpdated = function() {
+    var state = wave.getState();
+    var difficulty = state.get('difficulty');
+    if (!difficulty) {
+        this._menu.show();
+        return;
+    }
+    var moves = this._getMoves();
+    if ($.isEmptyObject(moves)) {
+        var params = this._getGameParamsByDifficulty(difficulty);
+        this._game.placeBombs(params.width, params.height, params.bombs);
+        return;
+    }
+    if (!this._game.isInitialized) {
+        var params = this._getGameParamsByDifficulty(difficulty);
+        this._game.init(params.width, params.height);
+        this._game.show();
+        gadgets.window.adjustHeight();
+    }
+    this._applyMoves(moves);
+};
+
+Gadget.prototype.init = function() {
+    gadgets.util.registerOnLoadHandler($.proxy(function() {
+        if (!wave || !wave.isInWaveContainer()) {
+            return;
+        }
+        this._menu = new Menu($.proxy(this._onDifficultySelected, this));
+        this._game = new Game($.proxy(this._onGameFieldChanged, this), $.proxy(this._onGameRestarted, this));
+        wave.setStateCallback(this._onStateUpdated);
+    }, this));
+};
+
+            var gadget = new Gadget();
+            gadget.init();
+        </script>
+    </body>
+</html>
+
+    ]]>
+    </Content>
+</Module>

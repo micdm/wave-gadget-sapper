@@ -1,4 +1,2 @@
-wave-gadget-sapper
-==================
-
-A Minesweeper game as the gadget for Google Wave.
+Classic Minesweeper game but in coop-mode? Yeah, why not.  
+Use `gadget.xml` from build directory.
