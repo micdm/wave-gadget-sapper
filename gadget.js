@@ -116,6 +116,6 @@ Gadget.prototype.init = function() {
         }
         this._menu = new Menu($.proxy(this._onDifficultySelected, this));
         this._game = new Game($.proxy(this._onGameFieldChanged, this), $.proxy(this._onGameRestarted, this));
-        wave.setStateCallback(this._onStateUpdated);
+        wave.setStateCallback($.proxy(this._onStateUpdated, this));
     }, this));
 };
