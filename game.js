@@ -90,7 +90,7 @@ Game.prototype._addBombToCell = function(cell) {
     this._updateBombCounter(1);
 };
 
-Game.prototype._getFlagCount = function() {
+Game.prototype._getTotalFlagCount = function() {
     var count = 0;
     for (var i = 0; i < this._height; i += 1) {
         for (var j = 0; j < this._width; j += 1) {
@@ -108,14 +108,15 @@ Game.prototype._checkForWin = function() {
             return;
         }
     }
-    var flagged = this._getFlagCount();
+    var flagged = this._getTotalFlagCount();
     if (flagged != this._mined.length) {
         return;
     }
     for (var i = 0; i < this._height; i += 1) {
         for (var j = 0; j < this._width; j += 1) {
-            if (!this._field[i][j].isFlagged) {
-                this._openCell(j, i);
+            var cell = this._field[i][j];
+            if (!cell.isOpened && !cell.isFlagged) {
+                return;
             }
         }
     }
@@ -132,11 +133,11 @@ Game.prototype._overGame = function() {
     $('#game-over').show();
 };
 
-Game.prototype._getBombCount = function(x, y) {
+Game.prototype._getCellCount = function(x, y, test) {
     var count = 0;
     for (var i = y - 1; i <= y + 1; i += 1) {
         for (var j = x - 1; j <= x + 1; j += 1) {
-            if (this._field[i] && this._field[i][j] && this._field[i][j].isMined) {
+            if (this._field[i] && this._field[i][j] && test(this._field[i][j])) {
                 count += 1;
             }
         }
@@ -144,14 +145,49 @@ Game.prototype._getBombCount = function(x, y) {
     return count;
 };
 
+Game.prototype._getBombCount = function(x, y) {
+    return this._getCellCount(x, y, function(cell) {
+        return cell.isMined;
+    });
+};
+
+Game.prototype._getFlagCount = function(x, y) {
+    return this._getCellCount(x, y, function(cell) {
+        return cell.isFlagged;
+    });
+};
+
 Game.prototype._openAround = function(x, y) {
     for (var i = y - 1; i <= y + 1; i += 1) {
         for (var j = x - 1; j <= x + 1; j += 1) {
-            if (!this._field[i] || !this._field[i][j]) {
+            if (this._field[i] && this._field[i][j]) {
+                this._openCell(j, i);
+            }
+        }
+    }
+};
+
+Game.prototype._openAroundIfFlagged = function(x, y) {
+    var bombs = this._getBombCount(x, y);
+    var flags = this._getFlagCount(x, y);
+    if (!bombs || flags < bombs) {
+        return;
+    }
+    var changes = [];
+    for (var i = y - 1; i <= y + 1; i += 1) {
+        for (var j = x - 1; j <= x + 1; j += 1) {
+            if (!this._field[i]) {
                 continue;
             }
-            this._openCell(j, i);
+            var cell = this._field[i][j];
+            if (!cell || cell.isOpened || cell.isFlagged) {
+                continue;
+            }
+            changes.push([j, i, this.CHANGES.OPENED]);
         }
+    }
+    if (changes.length) {
+        this._onFieldChanged(changes);
     }
 };
 
@@ -209,8 +245,12 @@ Game.prototype._onCellClick = function(x, y, setFlag) {
         if (cell.isFlagged) {
             return;
         }
-        var change = [x, y, this.CHANGES.OPENED];
-        this._onFieldChanged([change]);
+        if (cell.isOpened) {
+            this._openAroundIfFlagged(x, y);
+        } else {
+            var change = [x, y, this.CHANGES.OPENED];
+            this._onFieldChanged([change]);
+        }
     }
 };
 
@@ -261,4 +301,8 @@ Game.prototype.deinit = function() {
 
 Game.prototype.show = function() {
     $('#game').show();
+};
+
+Game.prototype.hide = function() {
+    $('#game').hide();
 };
