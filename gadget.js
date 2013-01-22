@@ -37,6 +37,13 @@ Gadget.prototype._getGameParamsByDifficulty = function(difficulty) {
             bombs: 99
         };
     }
+    if (difficulty == 'insane') {
+        return {
+            width: 10,
+            height: 10,
+            bombs: 99
+        };
+    }
 };
 
 Gadget.prototype._placeBombs = function(difficulty) {

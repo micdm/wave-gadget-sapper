@@ -140,6 +140,7 @@ body {
             <a id="start-easy" href="javascript:void(0)">Easy</a>
             <a id="start-normal" href="javascript:void(0)">Normal</a>
             <a id="start-hard" href="javascript:void(0)">Hard</a>
+            <a id="start-insane" href="javascript:void(0)">Insane</a>
         </div>
         <div id="game">
             <a id="restart" href="javascript:void(0)">New</a>
@@ -168,6 +169,9 @@ Menu.prototype._addClickListener = function() {
         }
         if (id == 'start-hard') {
             this._onDifficultSelected('hard');
+        }
+        if (id == 'start-insane') {
+            this._onDifficultSelected('insane');
         }
     }, this));
 };
@@ -531,6 +535,13 @@ Gadget.prototype._getGameParamsByDifficulty = function(difficulty) {
         return {
             width: 30,
             height: 16,
+            bombs: 99
+        };
+    }
+    if (difficulty == 'insane') {
+        return {
+            width: 10,
+            height: 10,
             bombs: 99
         };
     }

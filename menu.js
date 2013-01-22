@@ -15,6 +15,9 @@ Menu.prototype._addClickListener = function() {
         if (id == 'start-hard') {
             this._onDifficultSelected('hard');
         }
+        if (id == 'start-insane') {
+            this._onDifficultSelected('insane');
+        }
     }, this));
 };
 
