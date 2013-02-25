@@ -1,25 +1,25 @@
-var Menu = function(onDifficultSelected) {
+var Menu = function(onDifficultySelected) {
     this._node = $('#menu');
-    this._onDifficultSelected = onDifficultSelected;
+    this._onDifficultySelected = onDifficultySelected;
 };
 
 Menu.prototype._addClickListener = function() {
     this._node.click($.proxy(function(event) {
         var id = $(event.target).attr('id');
         if (id == 'start-baby') {
-            this._onDifficultSelected('baby');
+            this._onDifficultySelected('baby');
         }
         if (id == 'start-easy') {
-            this._onDifficultSelected('easy');
+            this._onDifficultySelected('easy');
         }
         if (id == 'start-normal') {
-            this._onDifficultSelected('normal');
+            this._onDifficultySelected('normal');
         }
         if (id == 'start-hard') {
-            this._onDifficultSelected('hard');
+            this._onDifficultySelected('hard');
         }
         if (id == 'start-insane') {
-            this._onDifficultSelected('insane');
+            this._onDifficultySelected('insane');
         }
     }, this));
 };
