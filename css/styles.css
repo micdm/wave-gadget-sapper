@@ -111,9 +111,9 @@ body {
 }
 
 #field td.flagged {
-    background: no-repeat center center url(data:image/png;base64,%% flag.png base64 %%);
+    background: no-repeat center center url(data:image/png;base64,%% img/flag.png base64 %%);
 }
 
 #field td.mined {
-    background: no-repeat center center url(data:image/png;base64,%% bomb.png base64 %%);
+    background: no-repeat center center url(data:image/png;base64,%% img/bomb.png base64 %%);
 }

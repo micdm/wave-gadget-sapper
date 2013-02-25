@@ -6,7 +6,7 @@
     </ModulePrefs>
     <Content type="html">
     <![CDATA[
-        %% index.htm %%
+        %% htm/index.htm %%
     ]]>
     </Content>
 </Module>

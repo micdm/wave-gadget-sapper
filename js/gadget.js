@@ -119,6 +119,7 @@ Gadget.prototype._onStateUpdated = function() {
     var difficulty = state.get(this.KEYS.DIFFICULTY);
     if (!difficulty) {
         this._menu.show();
+        gadgets.window.adjustHeight();
         return;
     }
     this._menu.hide();
