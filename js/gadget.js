@@ -16,6 +16,13 @@ Gadget.prototype._updateState = function(delta) {
 };
 
 Gadget.prototype._getGameParamsByDifficulty = function(difficulty) {
+    if (difficulty == 'baby') {
+        return {
+            width: 9,
+            height: 9,
+            bombs: 1
+        };
+    }
     if (difficulty == 'easy') {
         return {
             width: 9,

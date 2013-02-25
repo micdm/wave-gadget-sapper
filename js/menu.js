@@ -6,6 +6,9 @@ var Menu = function(onDifficultSelected) {
 Menu.prototype._addClickListener = function() {
     this._node.click($.proxy(function(event) {
         var id = $(event.target).attr('id');
+        if (id == 'start-baby') {
+            this._onDifficultSelected('baby');
+        }
         if (id == 'start-easy') {
             this._onDifficultSelected('easy');
         }

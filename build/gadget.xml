@@ -137,6 +137,7 @@ body {
             <div>Left click to open cell, right click to toggle flag.</div>
             <div>Mark all the bombs &rarr; you are winner!</div>
             <div>Choose your destiny:</div>
+            <a id="start-baby" href="javascript:void(0)">Baby</a>
             <a id="start-easy" href="javascript:void(0)">Easy</a>
             <a id="start-normal" href="javascript:void(0)">Normal</a>
             <a id="start-hard" href="javascript:void(0)">Hard</a>
@@ -161,6 +162,9 @@ body {
 Menu.prototype._addClickListener = function() {
     this._node.click($.proxy(function(event) {
         var id = $(event.target).attr('id');
+        if (id == 'start-baby') {
+            this._onDifficultSelected('baby');
+        }
         if (id == 'start-easy') {
             this._onDifficultSelected('easy');
         }
@@ -517,6 +521,13 @@ Gadget.prototype._updateState = function(delta) {
 };
 
 Gadget.prototype._getGameParamsByDifficulty = function(difficulty) {
+    if (difficulty == 'baby') {
+        return {
+            width: 9,
+            height: 9,
+            bombs: 1
+        };
+    }
     if (difficulty == 'easy') {
         return {
             width: 9,
