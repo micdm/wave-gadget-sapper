@@ -13,6 +13,51 @@ body {
     display: none;
 }
 
+#select-difficulty {
+    list-style: square inside;
+}
+
+#select-difficulty li {
+    float: left;
+    margin-right: 15px;
+}
+
+#start-baby {
+    color: #d47575;
+}
+
+#start-baby span:nth-child(2n) {
+    color: #d47575;
+}
+
+#start-baby span:nth-child(2n+1) {
+    color: #75add4;
+}
+
+#start-baby span:nth-child(3n) {
+    font-weight: bold;
+}
+
+#start-baby span:nth-child(4n) {
+    font-style: italic;
+}
+
+#start-easy {
+    color: #00b200;
+}
+
+#start-normal {
+    color: #e3c100;
+}
+
+#start-hard {
+    color: orange;
+}
+
+#start-insane {
+    color: red;
+}
+
 #restart {
     position: absolute;
     padding: 5px;

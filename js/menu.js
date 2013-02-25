@@ -3,29 +3,25 @@ var Menu = function(onDifficultySelected) {
     this._onDifficultySelected = onDifficultySelected;
 };
 
+Menu.prototype.LEVELS = ['baby', 'easy', 'normal', 'hard', 'insane'];
+
 Menu.prototype._addClickListener = function() {
-    this._node.click($.proxy(function(event) {
-        var id = $(event.target).attr('id');
-        if (id == 'start-baby') {
-            this._onDifficultySelected('baby');
-        }
-        if (id == 'start-easy') {
-            this._onDifficultySelected('easy');
-        }
-        if (id == 'start-normal') {
-            this._onDifficultySelected('normal');
-        }
-        if (id == 'start-hard') {
-            this._onDifficultySelected('hard');
-        }
-        if (id == 'start-insane') {
-            this._onDifficultySelected('insane');
-        }
-    }, this));
+    for (var i in this.LEVELS) {
+        var level = this.LEVELS[i];
+        this._node.find('#start-' + level).click($.proxy(function(level) {
+            return function() {
+                this._onDifficultySelected(level);
+                return false;
+            };
+        }(level), this));
+    }
 };
 
 Menu.prototype._removeClickListener = function() {
-    this._node.unbind('click');
+    for (var i in this.LEVELS) {
+        var level = this.LEVELS[i];
+        this._node.find('#start-' + level).unbind('click');
+    }
 };
 
 Menu.prototype.show = function() {

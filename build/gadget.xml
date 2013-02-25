@@ -25,6 +25,51 @@ body {
     display: none;
 }
 
+#select-difficulty {
+    list-style: square inside;
+}
+
+#select-difficulty li {
+    float: left;
+    margin-right: 15px;
+}
+
+#start-baby {
+    color: #d47575;
+}
+
+#start-baby span:nth-child(2n) {
+    color: #d47575;
+}
+
+#start-baby span:nth-child(2n+1) {
+    color: #75add4;
+}
+
+#start-baby span:nth-child(3n) {
+    font-weight: bold;
+}
+
+#start-baby span:nth-child(4n) {
+    font-style: italic;
+}
+
+#start-easy {
+    color: #00b200;
+}
+
+#start-normal {
+    color: #e3c100;
+}
+
+#start-hard {
+    color: orange;
+}
+
+#start-insane {
+    color: red;
+}
+
 #restart {
     position: absolute;
     padding: 5px;
@@ -137,14 +182,16 @@ body {
             <div>Left click to open cell, right click to toggle flag.</div>
             <div>Mark all the bombs &rarr; you are winner!</div>
             <div>Choose your destiny:</div>
-            <a id="start-baby" href="javascript:void(0)">Baby</a>
-            <a id="start-easy" href="javascript:void(0)">Easy</a>
-            <a id="start-normal" href="javascript:void(0)">Normal</a>
-            <a id="start-hard" href="javascript:void(0)">Hard</a>
-            <a id="start-insane" href="javascript:void(0)">Insane</a>
+            <ul id="select-difficulty">
+                <li><a id="start-baby" href="#"><span>B</span><span>a</span><span>b</span><span>y</span></a></li>
+                <li><a id="start-easy" href="#">Easy</a></li>
+                <li><a id="start-normal" href="#">Normal</a></li>
+                <li><a id="start-hard" href="#">Hard</a></li>
+                <li><a id="start-insane" href="#">Insane</a></li>
+            </ul>
         </div>
         <div id="game">
-            <a id="restart" href="javascript:void(0)">New</a>
+            <a id="restart" href="#">New</a>
             <div id="bomb-counter"></div>
             <div id="field-container">
                 <div id="game-over">Game over :-(</div>
@@ -159,29 +206,25 @@ body {
     this._onDifficultySelected = onDifficultySelected;
 };
 
+Menu.prototype.LEVELS = ['baby', 'easy', 'normal', 'hard', 'insane'];
+
 Menu.prototype._addClickListener = function() {
-    this._node.click($.proxy(function(event) {
-        var id = $(event.target).attr('id');
-        if (id == 'start-baby') {
-            this._onDifficultySelected('baby');
-        }
-        if (id == 'start-easy') {
-            this._onDifficultySelected('easy');
-        }
-        if (id == 'start-normal') {
-            this._onDifficultySelected('normal');
-        }
-        if (id == 'start-hard') {
-            this._onDifficultySelected('hard');
-        }
-        if (id == 'start-insane') {
-            this._onDifficultySelected('insane');
-        }
-    }, this));
+    for (var i in this.LEVELS) {
+        var level = this.LEVELS[i];
+        this._node.find('#start-' + level).click($.proxy(function(level) {
+            return function() {
+                this._onDifficultySelected(level);
+                return false;
+            };
+        }(level), this));
+    }
 };
 
 Menu.prototype._removeClickListener = function() {
-    this._node.unbind('click');
+    for (var i in this.LEVELS) {
+        var level = this.LEVELS[i];
+        this._node.find('#start-' + level).unbind('click');
+    }
 };
 
 Menu.prototype.show = function() {

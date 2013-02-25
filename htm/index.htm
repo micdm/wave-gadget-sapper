@@ -10,14 +10,16 @@
             <div>Left click to open cell, right click to toggle flag.</div>
             <div>Mark all the bombs &rarr; you are winner!</div>
             <div>Choose your destiny:</div>
-            <a id="start-baby" href="javascript:void(0)">Baby</a>
-            <a id="start-easy" href="javascript:void(0)">Easy</a>
-            <a id="start-normal" href="javascript:void(0)">Normal</a>
-            <a id="start-hard" href="javascript:void(0)">Hard</a>
-            <a id="start-insane" href="javascript:void(0)">Insane</a>
+            <ul id="select-difficulty">
+                <li><a id="start-baby" href="#"><span>B</span><span>a</span><span>b</span><span>y</span></a></li>
+                <li><a id="start-easy" href="#">Easy</a></li>
+                <li><a id="start-normal" href="#">Normal</a></li>
+                <li><a id="start-hard" href="#">Hard</a></li>
+                <li><a id="start-insane" href="#">Insane</a></li>
+            </ul>
         </div>
         <div id="game">
-            <a id="restart" href="javascript:void(0)">New</a>
+            <a id="restart" href="#">New</a>
             <div id="bomb-counter"></div>
             <div id="field-container">
                 <div id="game-over">Game over :-(</div>
