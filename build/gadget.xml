@@ -323,51 +323,56 @@ Game.prototype._createFieldTable = function(width, height) {
     }
 };
 
-Game.prototype._addBombToCell = function(cell) {
+Game.prototype._addBombToCell = function(x, y) {
+    var cell = this._field[y][x];
     cell.isMined = true;
-    this._mined.push(cell);
+    this._mined.push({
+        x: x,
+        y: y,
+        cell: cell
+    });
     this._updateBombCounter(1);
 };
 
-Game.prototype._getTotalFlagCount = function() {
-    var count = 0;
-    for (var i = 0; i < this._height; i += 1) {
-        for (var j = 0; j < this._width; j += 1) {
-            if (this._field[i][j].isFlagged) {
-                count += 1;
-            }
+Game.prototype._flagAllBombs = function() {
+    for (var i in this._mined) {
+        var mined = this._mined[i];
+        if (!mined.cell.isFlagged) {
+            this.changeCell(mined.x, mined.y, this.CHANGES.FLAGGED);
         }
     }
-    return count;
 };
 
-Game.prototype._checkForWin = function() {
+Game.prototype._blowAllBombsUp = function() {
     for (var i in this._mined) {
-        if (!this._mined[i].isFlagged) {
-            return;
-        }
+        var mined = this._mined[i];
+        mined.cell.node.addClass('mined');
     }
-    var flagged = this._getTotalFlagCount();
-    if (flagged != this._mined.length) {
-        return;
-    }
+};
+
+Game.prototype._areAllEmptyCellsOpened = function() {
     for (var i = 0; i < this._height; i += 1) {
         for (var j = 0; j < this._width; j += 1) {
             var cell = this._field[i][j];
-            if (!cell.isOpened && !cell.isFlagged) {
-                return;
+            if (!cell.isMined && !cell.isOpened) {
+                return false;
             }
         }
     }
+    return true;
+};
+
+Game.prototype._checkForWin = function() {
+    if (!this._areAllEmptyCellsOpened()) {
+        return;
+    }
+    this._flagAllBombs();
     this._isFinished = true;
     $('#well-done').show();
 };
 
 Game.prototype._overGame = function() {
-    for (var i in this._mined) {
-        var cell = this._mined[i];
-        cell.node.addClass('mined');
-    }
+    this._blowAllBombsUp();
     this._isFinished = true;
     $('#game-over').show();
 };
@@ -449,7 +454,7 @@ Game.prototype._openCell = function(x, y) {
 Game.prototype.changeCell = function(x, y, change) {
     var cell = this._field[y][x];
     if (change == this.CHANGES.MINED) {
-        this._addBombToCell(cell);
+        this._addBombToCell(x, y);
     }
     if (change == this.CHANGES.FLAGGED) {
         cell.isFlagged = true;
