@@ -323,17 +323,6 @@ Game.prototype._createFieldTable = function(width, height) {
     }
 };
 
-Game.prototype._addBombToCell = function(x, y) {
-    var cell = this._field[y][x];
-    cell.isMined = true;
-    this._mined.push({
-        x: x,
-        y: y,
-        cell: cell
-    });
-    this._updateBombCounter(1);
-};
-
 Game.prototype._flagAllBombs = function() {
     for (var i in this._mined) {
         var mined = this._mined[i];
@@ -453,20 +442,26 @@ Game.prototype._openCell = function(x, y) {
 
 Game.prototype.changeCell = function(x, y, change) {
     var cell = this._field[y][x];
-    if (change == this.CHANGES.MINED) {
-        this._addBombToCell(x, y);
+    if (change == this.CHANGES.MINED && !cell.isMined) {
+        cell.isMined = true;
+        this._mined.push({
+            x: x,
+            y: y,
+            cell: cell
+        });
+        this._updateBombCounter(1);
     }
-    if (change == this.CHANGES.FLAGGED) {
+    if (change == this.CHANGES.FLAGGED && !cell.isFlagged) {
         cell.isFlagged = true;
         cell.node.addClass('flagged');
         this._updateBombCounter(cell.isFlagged ? -1 : 1);
     }
-    if (change == this.CHANGES.UNFLAGGED) {
+    if (change == this.CHANGES.UNFLAGGED && cell.isFlagged) {
         cell.isFlagged = false;
         cell.node.removeClass('flagged');
         this._updateBombCounter(cell.isFlagged ? -1 : 1);
     }
-    if (change == this.CHANGES.OPENED) {
+    if (change == this.CHANGES.OPENED && !cell.isOpened) {
         if (cell.isMined) {
             cell.node.addClass('mined');
             this._overGame();
