@@ -1,6 +1,7 @@
-#/usr/bin/python
+#!/usr/bin/python
 
 from base64 import b64encode
+import os.path
 import sys
 
 TAG = '%%'
@@ -22,5 +23,6 @@ while (True):
         file_body = b64encode(file_body)
     result = result[0:start] + file_body + result[end + len(TAG):]
 
-with open('build/%s'%start_from, 'w') as output:
+output_file = os.path.join('build', os.path.basename(start_from))
+with open(output_file, 'w') as output:
     output.write(result)

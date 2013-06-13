@@ -13,6 +13,8 @@ body {
     display: none;
 }
 
+/* Menu */
+
 #select-difficulty {
     list-style: square inside;
 }
@@ -58,21 +60,24 @@ body {
     color: red;
 }
 
+/* Game */
+
 #restart {
-    position: absolute;
-    padding: 5px;
+    margin: 5px 0;
+    padding: 1px 3px;
 }
 
 #bomb-counter {
     position: absolute;
-    top: 25px;
-    font-size: 24px;
-    padding: 5px;
+    right: 0;
+    top: -24px;
+    background: no-repeat left center url(data:image/png;base64,%% img/bomb.png base64 %%);
+    padding-left: 22px;
 }
 
 #field-container {
-    position: absolute;
-    left: 60px;
+    display: inline-block;
+    position: relative;
 }
 
 #well-done, #game-over {

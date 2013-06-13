@@ -25,6 +25,8 @@ body {
     display: none;
 }
 
+/* Menu */
+
 #select-difficulty {
     list-style: square inside;
 }
@@ -70,21 +72,24 @@ body {
     color: red;
 }
 
+/* Game */
+
 #restart {
-    position: absolute;
-    padding: 5px;
+    margin: 5px 0;
+    padding: 1px 3px;
 }
 
 #bomb-counter {
     position: absolute;
-    top: 25px;
-    font-size: 24px;
-    padding: 5px;
+    right: 0;
+    top: -24px;
+    background: no-repeat left center url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QESEjcLvXMdVwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACGSURBVDjLvZQxDsAgDANJxJfYeTo7j6ILdVEIFipVs6H4ZGIipJUa3paGg+qw5CQ57QCjUk1jpXMFHcbkxB8tiB9nw0NqjmPAYtLmkxuxuu12FyEdeGdmVCQ9EXF5XCH6JhPmy74PbIc8DUz5DvH90xUJwBxHXrkn91cSSSt1dX//qf77SS5dqVqcOao3+wAAAABJRU5ErkJggg==);
+    padding-left: 22px;
 }
 
 #field-container {
-    position: absolute;
-    left: 60px;
+    display: inline-block;
+    position: relative;
 }
 
 #well-done, #game-over {
@@ -191,12 +196,14 @@ body {
             </ul>
         </div>
         <div id="game">
-            <a id="restart" href="#">New</a>
-            <div id="bomb-counter"></div>
-            <div id="field-container">
-                <div id="game-over">Game over :-(</div>
-                <div id="well-done">Well done :-)</div>
-                <table id="field"></table>
+            <button id="restart" title="Press N to start new game">New game (N)</button>
+            <div>
+                <div id="field-container">
+                    <div id="bomb-counter" title="Bombs remaining"></div>
+                    <div id="game-over">Game over :-(</div>
+                    <div id="well-done">Well done :-)</div>
+                    <table id="field"></table>
+                </div>
             </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
@@ -495,10 +502,10 @@ Game.prototype._onCellClick = function(x, y, setFlag) {
 
 Game.prototype._addClickListener = function() {
     $('#game')
-        .contextmenu($.proxy(function() {
+        .bind('contextmenu.game', $.proxy(function() {
             return this._isFinished;
         }, this))
-        .mouseup($.proxy(function(event) {
+        .bind('mouseup.game', $.proxy(function(event) {
             var node = $(event.target);
             if (node.attr('id') == 'restart') {
                 this._onRestarted();
@@ -516,8 +523,17 @@ Game.prototype._addClickListener = function() {
         }, this));
 };
 
-Game.prototype._removeClickListener = function() {
-    $('#game').unbind();
+Game.prototype._addKeyboardListener = function() {
+    $(document).bind('keypress.game', $.proxy(function(event) {
+        if (event.which == 78 || event.which == 110) {
+            this._onRestarted();
+        }
+    }, this));
+};
+
+Game.prototype._removeListeners = function() {
+    $('#game').unbind('.game');
+    $(document).unbind('.game');
 };
 
 Game.prototype.init = function(width, height) {
@@ -529,12 +545,13 @@ Game.prototype.init = function(width, height) {
     this._createField(width, height);
     this._createFieldTable(width, height);
     this._addClickListener();
+    this._addKeyboardListener();
     this.isInitialized = true;
 };
 
 Game.prototype.deinit = function() {
     this._resetDom();
-    this._removeClickListener();
+    this._removeListeners();
     this.isInitialized = false;
 };
 

@@ -256,10 +256,10 @@ Game.prototype._onCellClick = function(x, y, setFlag) {
 
 Game.prototype._addClickListener = function() {
     $('#game')
-        .contextmenu($.proxy(function() {
+        .bind('contextmenu.game', $.proxy(function() {
             return this._isFinished;
         }, this))
-        .mouseup($.proxy(function(event) {
+        .bind('mouseup.game', $.proxy(function(event) {
             var node = $(event.target);
             if (node.attr('id') == 'restart') {
                 this._onRestarted();
@@ -277,8 +277,17 @@ Game.prototype._addClickListener = function() {
         }, this));
 };
 
-Game.prototype._removeClickListener = function() {
-    $('#game').unbind();
+Game.prototype._addKeyboardListener = function() {
+    $(document).bind('keypress.game', $.proxy(function(event) {
+        if (event.which == 78 || event.which == 110) {
+            this._onRestarted();
+        }
+    }, this));
+};
+
+Game.prototype._removeListeners = function() {
+    $('#game').unbind('.game');
+    $(document).unbind('.game');
 };
 
 Game.prototype.init = function(width, height) {
@@ -290,12 +299,13 @@ Game.prototype.init = function(width, height) {
     this._createField(width, height);
     this._createFieldTable(width, height);
     this._addClickListener();
+    this._addKeyboardListener();
     this.isInitialized = true;
 };
 
 Game.prototype.deinit = function() {
     this._resetDom();
-    this._removeClickListener();
+    this._removeListeners();
     this.isInitialized = false;
 };
 
